@@ -1,5 +1,7 @@
 /*
  * File:   main.cpp
+ * Desenvolvido e testado em sistema Linux
+ *
  */
 
 #include <stdlib.h>
@@ -30,15 +32,57 @@ void imprimeLinha(int offset,FILE *f) {
     printf("%s",linha);
 }
 
+// retorna a palavra formada pelos "tamanho" primeiros caracteres da "linha" obtida do arquivo
+char * obterPalavra(char *linha, int tamanho){
+    if(strlen(linha) <= tamanho) return linha;
+    char *palavra = (char *) malloc(sizeof(char) * tamanho);
+    for(int i=0; i<tamanho; i++){
+        palavra[i] = linha[i];
+    }
+    palavra[tamanho] = '\0';
+    return palavra;
+}
+
 // classe que implementa a lista invertida
 class listaInvertida {
 public:
     // construtor
-    listaInvertida() { }
+    listaInvertida() {
+        this->lista = fopen("lista_invertida.txt", "w+");
+     }
     // destrutor
-    ~listaInvertida() { }
+    ~listaInvertida() {
+        fclose(this->lista);
+     }
     // adiciona palavra na estrutura
-    void adiciona(char *palavra, int offset) { }
+    void adiciona(char *palavra, int offset) { 
+        // voltar ao começo do arquivo da lista
+        fseek(this->lista, 0, SEEK_SET);
+        char linha[2048];
+        bool palavraTavaSalva = false;
+        
+        // verificar se a palavra já está salva no arquivo lista
+        while(! feof(this->lista)){
+            fgets(linha, 2047, this->lista);
+            char* word = obterPalavra(linha, strlen(palavra));
+            if(strcmp(word, palavra) == 0){
+                palavraTavaSalva = true;
+                break;
+            }
+        }
+
+        if(palavraTavaSalva){ // caso positivo adicionar o offset ao vetor salvo no arquivo lista 
+            // aqui tem que alterar a linha e salva-la novamente no arquivo lista
+        }
+        else { // caso negativo adicionar a palavra ao arquivo e seu respectivo offset
+            // criar a linha com a palavra e o offset e adicionar de forma alfabética no arquivo
+            // por exemplo:
+            // palavra : { 0x00001, 0x00021 }
+        }
+
+        // salvar alterações no arquivo lista
+        fflush(this->lista);
+    }
     // realiza busca, retornando vetor de offsets que referenciam a palavra
     int * busca(char *palavra, int *quantidade) {
         // substituir pelo resultado da busca na lista invertida
@@ -59,6 +103,7 @@ public:
         return offsets;
     }
 private:
+    FILE *lista;
 };
 
 // programa principal
