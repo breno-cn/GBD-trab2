@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <fstream>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -19,6 +21,20 @@ void removePontuacao (char *palavra) {
         (palavra[length-1] == ':') || (palavra[length-1] == '?') || (palavra[length-1] == '!')
        )
         palavra[length-1] = '\0';
+}
+
+void removeEspacos(char * palavra){
+    char * temp = new char[strlen(palavra)];
+    int j=0;
+
+    for (j=0; j<strlen(palavra); j++){
+        for(int i=0; i<strlen(palavra); i++){
+            if(palavra[i] == ' ') continue;
+            temp[j] = palavra[i];
+        }
+    }
+    temp[j] = '\0';
+    palavra = temp;
 }
 
 // imprime linha do arquivo com base no offset da palavra
@@ -41,6 +57,53 @@ char * obterPalavra(char *linha, int tamanho){
     }
     palavra[tamanho] = '\0';
     return palavra;
+}
+
+char * extractStringBetweenTags(char * stringToSearch, char * startTag, char * endTag){
+    bool inserir = false;
+    int count = 0;
+    char * retorno = (char *) malloc(sizeof(char)*strlen(stringToSearch));
+
+    for (int i=0; i<strlen(stringToSearch); i++){
+        if(stringToSearch[i] == startTag[0]){
+            inserir = true;
+            continue;
+        }
+        if(stringToSearch[i] == endTag[0]){
+            inserir = false;
+            continue;
+        }
+        if(inserir){
+            retorno[count++] = stringToSearch[i];
+        }
+    }
+    retorno[count] = '\0';
+    return retorno;
+}
+
+int * separarVirgulas(char * offset){
+    char * str = offset;
+
+    char * pch;
+    printf ("Splitting string \"%s\" into tokens:\n",str);
+    pch = strtok (str,",");
+    vector<int> numbers;
+
+    while (pch != NULL){
+        printf ("%s\n",pch);
+        numbers.push_back(stoi(pch));
+        pch = strtok (NULL, ",");
+    }
+    int * ret;
+    std::copy(numbers.begin(), numbers.end(), ret);
+    // int * ret = &numbers[0];
+    return ret;
+}
+
+int * obterOffsets(char * linha){
+    char * offset = extractStringBetweenTags(linha, "{", "}");
+    std::cout << "offset: " << offset << "\n";
+    return separarVirgulas(offset);
 }
 
 // classe que implementa a lista invertida
@@ -81,25 +144,51 @@ public:
         }
 
         // salvar alterações no arquivo lista
-        fflush(this->lista);
+        // fflush(this->lista);
     }
     // realiza busca, retornando vetor de offsets que referenciam a palavra
     int * busca(char *palavra, int *quantidade) {
+        
+        // voltar ao inicio do arquivo lista
+        fseek(this->lista, 0, SEEK_SET);
+        char linha[2048];
+        bool palavraTavaSalva = false;
+        
+        // verificar se a palavra existe no arquivo lista
+        while(! feof(this->lista)){
+            fgets(linha, 2047, this->lista);
+            char* word = obterPalavra(linha, strlen(palavra));
+            if(strcmp(word, palavra) == 0){
+                palavraTavaSalva = true;
+                break;
+            }
+        }
+
         // substituir pelo resultado da busca na lista invertida
-        quantidade[0] = 10;
-        int *offsets = new int[10];
+        quantidade[0] = 0;
         int i = 0;
+        int *offsets = new int[1];
+
+        // palavra nao encontrada
+        if( ! palavraTavaSalva){
+            return offsets;
+        }
+
+        offsets = obterOffsets(linha);
+        quantidade[0] = sizeof(offsets)/sizeof(offsets[0]);
+
+
         // exemplo: retornar os primeiros 10 offsets da palavra "terra"
-        offsets[i++] = 58;
-        offsets[i++] = 69;
-        offsets[i++] = 846;
-        offsets[i++] = 943;
-        offsets[i++] = 1083;
-        offsets[i++] = 1109;
-        offsets[i++] = 1569;
-        offsets[i++] = 1792;
-        offsets[i++] = 2041;
-        offsets[i++] = 2431;
+        // offsets[i++] = 58;
+        // offsets[i++] = 69;
+        // offsets[i++] = 846;
+        // offsets[i++] = 943;
+        // offsets[i++] = 1083;
+        // offsets[i++] = 1109;
+        // offsets[i++] = 1569;
+        // offsets[i++] = 1792;
+        // offsets[i++] = 2041;
+        // offsets[i++] = 2431;
         return offsets;
     }
 private:
@@ -144,6 +233,7 @@ int main(int argc, char** argv) {
                 int quantidade;
                 // busca na lista invertida
                 int *offsets = lista.busca(palavra,&quantidade);
+                printf("qtd: %d", quantidade);
                 // com vetor de offsets, recuperar as linhas que contem a palavra desejada
                 if (quantidade > 0) {
                     FILE *f = fopen("biblia.txt","rt");
