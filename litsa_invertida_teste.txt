@@ -1,0 +1,5 @@
+palavra : { 1, 2, 3 }
+outra : { 1, 5, 7 }
+maisUma : { 0, 6, 5 }palavra : { 1, 2, 3 }
+outra : { 1, 5, 7 }
+maisUma : { 0, 6, 5 }

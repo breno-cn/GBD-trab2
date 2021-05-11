@@ -161,6 +161,7 @@ public:
         offsets = obterOffsets(linha);
         quantidade[0] = sizeof(offsets)/sizeof(offsets[0]);
 
+12 e perguntou-lhe: Amigo, como entraste aqui, sem teres veste nupcial? Ele, por�m, emudeceu.
 
         // exemplo: retornar os primeiros 10 offsets da palavra "terra"
         // offsets[i++] = 58;
