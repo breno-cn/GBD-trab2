@@ -3,6 +3,8 @@
  * Desenvolvido e testado em sistema Linux
  *
  */
+#include <map>
+#include <string>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -116,36 +118,18 @@ public:
     // destrutor
     ~listaInvertida() {
         fclose(this->lista);
-     }
+    }
+
+    map<string, vector<int>> listaTemp;
+
     // adiciona palavra na estrutura
     void adiciona(char *palavra, int offset) { 
-        // voltar ao começo do arquivo da lista
-        fseek(this->lista, 0, SEEK_SET);
-        char linha[2048];
-        bool palavraTavaSalva = false;
-        
-        // verificar se a palavra já está salva no arquivo lista
-        while(! feof(this->lista)){
-            fgets(linha, 2047, this->lista);
-            char* word = obterPalavra(linha, strlen(palavra));
-            if(strcmp(word, palavra) == 0){
-                palavraTavaSalva = true;
-                break;
-            }
-        }
-
-        if(palavraTavaSalva){ // caso positivo adicionar o offset ao vetor salvo no arquivo lista 
-            // aqui tem que alterar a linha e salva-la novamente no arquivo lista
-        }
-        else { // caso negativo adicionar a palavra ao arquivo e seu respectivo offset
-            // criar a linha com a palavra e o offset e adicionar de forma alfabética no arquivo
-            // por exemplo:
-            // palavra : { 0x00001, 0x00021 }
-        }
-
-        // salvar alterações no arquivo lista
-        // fflush(this->lista);
+        string palavraString(palavra);
+        vector<int> vetor = listaTemp[palavraString];
+        vetor.push_back(offset);
+        listaTemp[palavraString] = vetor;
     }
+
     // realiza busca, retornando vetor de offsets que referenciam a palavra
     int * busca(char *palavra, int *quantidade) {
         
@@ -197,6 +181,11 @@ private:
 
 // programa principal
 int main(int argc, char** argv) {
+    char *str = "Breno";
+    string strCpp(str);
+    map<string, vector<int>> listaInvertida; 
+    listaInvertida[strCpp] = {1, 2, 3};
+
     // abrir arquivo
     ifstream in("biblia.txt");
     if (!in.is_open()){
@@ -251,4 +240,3 @@ int main(int argc, char** argv) {
 
     return (EXIT_SUCCESS);
 }
-
