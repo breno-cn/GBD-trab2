@@ -1,0 +1,5 @@
+palavra
+teste
+um
+dois
+tres

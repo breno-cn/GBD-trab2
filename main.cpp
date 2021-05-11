@@ -113,7 +113,8 @@ class listaInvertida {
 public:
     // construtor
     listaInvertida() {
-        this->lista = fopen("lista_invertida.txt", "w+");
+        // this->lista = fopen("lista_invertida.txt", "w+");
+        this->lista = fopen("lista_invertida_teste.txt", "r");
      }
     // destrutor
     ~listaInvertida() {
@@ -132,38 +133,37 @@ public:
 
     // realiza busca, retornando vetor de offsets que referenciam a palavra
     int * busca(char *palavra, int *quantidade) {
-        
-        // voltar ao inicio do arquivo lista
+        // seek para começo do arquivo
         fseek(this->lista, 0, SEEK_SET);
+
+        // busca a posição da palavra
         char linha[2048];
-        bool palavraTavaSalva = false;
-        
-        // verificar se a palavra existe no arquivo lista
-        while(! feof(this->lista)){
-            fgets(linha, 2047, this->lista);
-            char* word = obterPalavra(linha, strlen(palavra));
-            if(strcmp(word, palavra) == 0){
-                palavraTavaSalva = true;
-                break;
+        int tamPalavra = strlen(palavra);
+        while (true) {
+            if (fgets(linha, 2048, this->lista) == NULL) {
+                // Chegou no final do arquivo e não encontrou nenhuma palavra
+                printf("NAO ENCONTROU A PALAVRA\n");
+                quantidade[0] = 0;
+                return NULL;
+            }
+
+            if (strncmp(palavra, linha, tamPalavra) == 0) {
+                // Encontrou a palavra
+                // VALOR DE TESTE PARA TESTAR A FUNÇÃO
+                quantidade[0] = 10;
+                int *offsets = new int[10];
+                for (int i = 0; i < 10; i++)
+                    offsets[i] = 58;
+                
+                return offsets;
             }
         }
 
         // substituir pelo resultado da busca na lista invertida
-        quantidade[0] = 0;
-        int i = 0;
-        int *offsets = new int[1];
-
-        // palavra nao encontrada
-        if( ! palavraTavaSalva){
-            return offsets;
-        }
-
-        offsets = obterOffsets(linha);
-        quantidade[0] = sizeof(offsets)/sizeof(offsets[0]);
-
-12 e perguntou-lhe: Amigo, como entraste aqui, sem teres veste nupcial? Ele, por�m, emudeceu.
-
-        // exemplo: retornar os primeiros 10 offsets da palavra "terra"
+        // quantidade[0] = 10;
+        // int *offsets = new int[10];
+        // int i = 0;
+        // // exemplo: retornar os primeiros 10 offsets da palavra "terra"
         // offsets[i++] = 58;
         // offsets[i++] = 69;
         // offsets[i++] = 846;
@@ -174,7 +174,7 @@ public:
         // offsets[i++] = 1792;
         // offsets[i++] = 2041;
         // offsets[i++] = 2431;
-        return offsets;
+        // return offsets;
     }
 private:
     FILE *lista;
@@ -182,11 +182,6 @@ private:
 
 // programa principal
 int main(int argc, char** argv) {
-    char *str = "Breno";
-    string strCpp(str);
-    map<string, vector<int>> listaInvertida; 
-    listaInvertida[strCpp] = {1, 2, 3};
-
     // abrir arquivo
     ifstream in("biblia.txt");
     if (!in.is_open()){
