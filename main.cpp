@@ -148,12 +148,34 @@ public:
             }
 
             if (strncmp(palavra, linha, tamPalavra) == 0) {
+                int i = tamPalavra;
+                while (linha[i] != '\0') {
+                    cout << linha[i];
+                    i++;
+                }
+
+                strtok(linha, " ");
+                char *token;
+                quantidade[0] = 0;
+                // int i = 0;
+                vector<int> offsetsVector;
+                while ((token = strtok(NULL, " ")) != NULL) {
+                    // printf("%s\n", temp);
+                    int num = atoi(token);
+                    quantidade[0] += 1;
+                    offsetsVector.push_back(num);
+                }
+
+                int* offsets = new int[quantidade[0]];
+                for (int i = 0; i < quantidade[0]; i++)
+                    offsets[i] = offsetsVector[i];
+
                 // Encontrou a palavra
                 // VALOR DE TESTE PARA TESTAR A FUNÇÃO
-                quantidade[0] = 10;
-                int *offsets = new int[10];
-                for (int i = 0; i < 10; i++)
-                    offsets[i] = 58;
+                // quantidade[0] = 10;
+                // int *offsets = new int[10];
+                // for (int i = 0; i < 10; i++)
+                //     offsets[i] = 58;
                 
                 return offsets;
             }
