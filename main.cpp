@@ -114,7 +114,7 @@ public:
     // construtor
     listaInvertida() {
         // this->lista = fopen("lista_invertida.txt", "w+");
-        this->lista = fopen("lista_invertida_teste.txt", "r");
+        this->lista = fopen("lista_invertida_teste2.txt", "w+dasas");
      }
     // destrutor
     ~listaInvertida() {
@@ -125,10 +125,49 @@ public:
 
     // adiciona palavra na estrutura
     void adiciona(char *palavra, int offset) { 
-        string palavraString(palavra);
-        vector<int> vetor = listaTemp[palavraString];
-        vetor.push_back(offset);
-        listaTemp[palavraString] = vetor;
+        string palavraStr(palavra);
+        // cout << "ADICIONA " << palavraStr << " " << palavra << endl;
+        
+        if (listaMap.find(palavraStr) == listaMap.end()) {
+            // vector<int> offsets = { offset };
+            listaMap[palavraStr] = { offset };
+            return;
+        }
+
+        vector<int> offsets = listaMap[palavraStr];
+        offsets.push_back(offset);
+        listaMap[palavraStr] = offsets;
+    }
+
+    // serializa a lista para arquivo
+    void serializarLista() {
+        // for (auto& it : listaMap) {
+        //     cout << it.first << ":";
+        //     for (auto& offset : it.second) {
+        //         cout << offset << " ";
+        //     }
+        //     cout << endl;
+        // }
+
+        fseek(this->lista, 0, SEEK_SET);
+        // cout << "AAAAAA" << endl;
+        char linha[500000];
+        for (auto& it : listaMap) {
+            // cout << it.first << endl;
+            auto palavra = it.first.c_str();
+            strcpy(linha, palavra);
+            strcat(linha, " ");
+            for (auto& offset : it.second) {
+                char offsetStr[100];
+                sprintf(offsetStr, "%d ", offset);
+                strcat(linha, offsetStr);
+                // cout << offset << "|" << endl;
+            }
+
+            strcat(linha, "\n");
+            fwrite(linha, sizeof(char), strlen(linha), this->lista);
+            cout << "LINHA " << linha << palavra << endl;
+        }
     }
 
     // realiza busca, retornando vetor de offsets que referenciam a palavra
@@ -200,6 +239,7 @@ public:
     }
 private:
     FILE *lista;
+    map<string, vector<int>> listaMap;
 };
 
 // programa principal
@@ -231,6 +271,7 @@ int main(int argc, char** argv) {
             }
         }
         in.close();
+        lista.serializarLista();
 
         // agora que ja construimos o indice, podemos realizar buscas
         do {
