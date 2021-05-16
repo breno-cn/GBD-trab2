@@ -1,1 +1,1 @@
-g++ main.cpp -o main && ./main
+g++ entrega/main.cpp -o entrega/main && cd entrega && ./main
