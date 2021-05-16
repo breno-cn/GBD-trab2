@@ -104,7 +104,7 @@ int * separarVirgulas(char * offset){
 
 int * obterOffsets(char * linha){
     char * offset = extractStringBetweenTags(linha, "{", "}");
-    std::cout << "offset: " << offset << "\n";
+    // std::cout << "offset: " << offset << "\n";
     return separarVirgulas(offset);
 }
 
@@ -166,7 +166,7 @@ public:
 
             strcat(linha, "\n");
             fwrite(linha, sizeof(char), strlen(linha), this->lista);
-            cout << "LINHA " << linha << palavra << endl;
+            // cout << "LINHA " << linha << palavra << endl;
         }
     }
 
@@ -189,7 +189,7 @@ public:
             if (strncmp(palavra, linha, tamPalavra) == 0) {
                 int i = tamPalavra;
                 while (linha[i] != '\0') {
-                    cout << linha[i];
+                    // cout << linha[i];
                     i++;
                 }
 
